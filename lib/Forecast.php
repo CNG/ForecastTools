@@ -263,8 +263,21 @@ class Forecast
     $responses = array();
 
     foreach ($request_urls as $request_url) {
-
-      $response = file_get_contents($request_url);
+      
+      /**
+        * Use Buffer to cache API-requests if initialized
+        * (if not, just get the latest data)
+        * 
+        * More info: http://git.io/FoO2Qw
+        */
+      
+      if(class_exists('Buffer')) {
+        $cache = new Buffer();
+        $response = $cache->data($request_url);
+      } else {
+        $response = file_get_contents($request_url);
+      }
+      
       $responses[] = $response;
       if ($response === false) {
         trigger_error(__FILE__ . ':L' . __LINE__ . ": Error on file_get_contents($request_url)\n");
