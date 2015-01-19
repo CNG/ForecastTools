@@ -174,6 +174,17 @@ class Forecast
         curl_setopt($ch[$i], CURLOPT_RETURNTRANSFER, 1);
         curl_multi_add_handle($mh, $ch[$i]);
       }
+      
+      // Following block replaces the commented out block below
+      // Old code worked w/ Ubuntu 12.04/Apache2.2, but not on Ubuntu 14.04 with Apache 2.4 and PHP-FPM
+      // Don't have time for more specifics at moment, but if you experience issues, try swapping out the blocks
+      
+      $running = null;
+      do {
+        $execReturnValue = curl_multi_exec($mh, $running);
+      } while($running > 0);
+      
+      /*
       do {
           $execReturnValue = curl_multi_exec($mh, $runningHandles);
       } while ($execReturnValue == CURLM_CALL_MULTI_PERFORM);
@@ -185,6 +196,8 @@ class Forecast
           } while ($execReturnValue == CURLM_CALL_MULTI_PERFORM);
         }
       }
+      */
+      
       if ($execReturnValue != CURLM_OK) {
         $err = "Multi cURL read error $execReturnValue";
         trigger_error(__FILE__ . ':L' . __LINE__ . ": $err\n");
